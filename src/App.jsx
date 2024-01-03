@@ -1,50 +1,81 @@
-import { useEffect, useState } from "react";
+// import React, { useEffect } from "react";
+// import { useState } from "react";
+// import Products from "./components/Products";
+
+// function App() {
+//   const [products, setProducts] = useState([]);
+//   const [isloading, setIsloading] = useState(false);
+//   const [isError, setIsError] = useState(false);
+//   useEffect(() => {
+//     getProducts();
+//   }, []);
+//   const getProducts = async () => {
+//     try {
+//       setIsloading(true);
+//       const response = await fetch("https://fakestoreapi.com/products/");
+//       if (!response.ok) {
+//         throw new Error("No products here");
+//       }
+//       const products = await response.json();
+
+//       setProducts(products);
+//     } catch (error) {
+//       setIsError(error.message);
+//     }
+//     setIsloading(false);
+//   };
+//   return (
+//     <>
+//       <section className="flex">
+//         {products.map((product) => (
+//           <Products key={product.id} product={product}/>
+//         ))}
+//         {isloading && <h1>Loading datas</h1>}
+//         {isError && <h1>{isError}</h1>}
+//       </section>
+//     </>
+//   );
+// }
+
+// export default App;
+
+import React from "react";
+import { useState } from "react";
+import Products from "./components/Products";
+import { useEffect } from "react";
 
 function App() {
-  let [id, setId] = useState([]);
-  let [error, setError] = useState(false);
-  let [todo, setTodo] = useState([]);
-  let getdata = async (e) => {
-    e.preventDefault();
-    if (id < 1) {
-      setError(true);
-      setId("");
-      setTodo("");
-      return;
+  const [productss, setProducts] = useState([]);
+  const [isloading, setIsloading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  let datas = async () => {
+    try {
+      setIsloading(true);
+      let response = await fetch("https://fakestoreapi.com/roducts/");
+      if (!response.ok) {
+        throw new Error("No product here");
+      }
+      let datas = await response.json();
+      setProducts(datas);
+    } catch (error) {
+      setIsError(error.message);
     }
-    let respone = await fetch(
-      `https://jsonplaceholder.typicode.com/todos/${id}`
-    );
-    let data = await respone.json();
-    setError(false);
-    setTodo(data);
-    setId("");
+    setIsloading(false);
   };
-  return (
-    <section>
-      <form onSubmit={getdata}>
-        <input
-          type="number"
-          value={id}
-          onChange={(e) => {
-            setId(e.target.value);
-          }}
-        />
-        <button type="submit">Click</button>
-      </form>
-      <div>
-        {error && <h1>Please enter a valid id (1 , 2 , 3 , 4 etc ...)</h1>}
 
-        {todo && (
-          <div>
-            <h1>title : {todo.title}</h1>
-            <h3>id : {todo.id}</h3>
-            <h3>userId : {todo.userId}</h3>
-            <h1>Completed : {todo.completed ? <p>Done</p> : <p>Not yet</p>}</h1>
-          </div>
-        )}
-      </div>
-    </section>
+  useEffect(() => {
+    datas();
+  }, []);
+  return (
+    <>
+      <section className="flex">
+        {productss.map((product) => (
+          <Products product={product} />
+        ))}
+        {isloading && <h1>Loading datas</h1>}
+        {isError && <h1>{isError}</h1>}
+      </section>
+    </>
   );
 }
 
