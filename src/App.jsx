@@ -1,81 +1,98 @@
-// import React, { useEffect } from "react";
-// import { useState } from "react";
-// import Products from "./components/Products";
-
+// import React, { useCallback, useState } from "react";
+// import Addnote from "./components/Addnote";
+// import Note from "./components/Note";
+// import Navbar from "./components/Navbar";
 // function App() {
-//   const [products, setProducts] = useState([]);
-//   const [isloading, setIsloading] = useState(false);
-//   const [isError, setIsError] = useState(false);
-//   useEffect(() => {
-//     getProducts();
-//   }, []);
-//   const getProducts = async () => {
-//     try {
-//       setIsloading(true);
-//       const response = await fetch("https://fakestoreapi.com/products/");
-//       if (!response.ok) {
-//         throw new Error("No products here");
-//       }
-//       const products = await response.json();
+//   const [notes, setNotes] = useState([]);
+//   const getnote = async () => {
+//     let response = await fetch(
+//       "https://firenode-af7e7-default-rtdb.firebaseio.com/notes.json"
+//     );
+//     let notes = await response.json();
+//     let modi = [];
 
-//       setProducts(products);
-//     } catch (error) {
-//       setIsError(error.message);
+//     for (let key in notes) {
+//       modi.push(notes[key]);
+//       setNotes(modi);
 //     }
-//     setIsloading(false);
 //   };
 //   return (
 //     <>
-//       <section className="flex">
-//         {products.map((product) => (
-//           <Products key={product.id} product={product}/>
-//         ))}
-//         {isloading && <h1>Loading datas</h1>}
-//         {isError && <h1>{isError}</h1>}
-//       </section>
+//       <Navbar getnote={getnote} />
+//       <Addnote />
+//       {notes.map((note, index) => {
+//         return <Note key={index} note={note} />;
+//       })}
 //     </>
 //   );
 // }
 
 // export default App;
-
-import React from "react";
-import { useState } from "react";
-import Products from "./components/Products";
-import { useEffect } from "react";
-
+import React, { useState } from "react";
+import Navbar from "./components/Navbar";
+import Note from "./components/Note";
+import Addnote from "./components/Addnote";
 function App() {
-  const [productss, setProducts] = useState([]);
-  const [isloading, setIsloading] = useState(false);
-  const [isError, setIsError] = useState(false);
-  let datas = async () => {
-    try {
-      setIsloading(true);
-      let response = await fetch("https://fakestoreapi.com/roducts/");
-      if (!response.ok) {
-        throw new Error("No product here");
-      }
-      let datas = await response.json();
-      setProducts(datas);
-    } catch (error) {
-      setIsError(error.message);
-    }
-    setIsloading(false);
-  };
+  const [notess, setNotess] = useState([]);
 
-  useEffect(() => {
-    datas();
-  }, []);
+  let [loading, setLoading] = useState(false);
+  let [error, setError] = useState(null);
+
+  let getnote = async () => {
+    try {
+      setLoading(true);
+      let response = await fetch(
+        "https://firenode-af7e7-default-rtdb.firebaseio.com/notes.json"
+      );
+
+      if (!response.ok) {
+        throw new Error("Can't connect to firebase");
+      }
+      let data = await response.json();
+
+      let modify = [];
+      for (let key in data) {
+        modify.push({
+          id: key,
+          note: data[key],
+        });
+      }
+      setNotess(modify);
+    } catch (er) {
+      setError(er.message);
+    }
+    setLoading(false);
+  };
+  // getnote();
   return (
-    <>
-      <section className="flex">
-        {productss.map((product) => (
-          <Products product={product} />
-        ))}
-        {isloading && <h1>Loading datas</h1>}
-        {isError && <h1>{isError}</h1>}
-      </section>
-    </>
+    <section>
+      <Navbar getnote={getnote} totalnotes={notess.length} />
+
+      {error && (
+        <>
+          <p className="load error">{error}</p>
+        </>
+      )}
+      {loading && (
+        <>
+          <p className="load">Loading datas</p>
+        </>
+      )}
+      {!loading && !error && (
+        <>
+          <Addnote getnote={getnote} />
+          {notess.map((notes) => {
+            return <Note notes={notes} getnote={getnote} />;
+          })}
+          {notess.length === 0 && (
+            <>
+              <h1>Add some notes</h1>
+            </>
+          )}
+        </>
+      )}
+      {/* <Note /> */}
+    </section>
   );
 }
 
